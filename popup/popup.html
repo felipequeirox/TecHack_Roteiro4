@@ -7,14 +7,15 @@
 <body>
 
   <header>
-    <h1>Privacy Monitor</h1>
-    <span id="version">v0.3</span>
+    <h1>Privacy Extension</h1>
   </header>
 
-  <nav>
-    <button class="tab-btn active" data-tab="third-parties">3rd Parties</button>
-    <button class="tab-btn" data-tab="cookies">Cookies</button>
-  </nav>
+<nav>
+  <button class="tab-btn active" data-tab="third-parties">3rd Parties</button>
+  <button class="tab-btn" data-tab="cookies">Cookies</button>
+  <button class="tab-btn" data-tab="storage">Storage</button>
+  <button class="tab-btn" data-tab="fingerprint">Fingerprint</button>
+</nav>
 
   <div id="tab-third-parties" class="tab-content active">
     <div class="section-header">
@@ -46,6 +47,41 @@
     </div>
     <ul id="list-supercookies">
       <li class="empty">Nenhum supercookie detectado.</li>
+    </ul>
+  </div>
+  
+  <div id="tab-storage" class="tab-content">
+    <div class="section-header">
+      Web Storage
+      <span id="count-storage" class="badge">0</span>
+    </div>
+
+    <div class="cookie-summary" id="storage-summary"></div>
+
+    <div class="subsection-title">localStorage</div>
+    <ul id="list-localstorage">
+      <li class="empty">Nenhum dado em localStorage.</li>
+    </ul>
+
+    <div class="subsection-title" style="margin-top:10px">sessionStorage</div>
+    <ul id="list-sessionstorage">
+      <li class="empty">Nenhum dado em sessionStorage.</li>
+    </ul>
+
+    <div class="subsection-title" style="margin-top:10px">IndexedDB</div>
+    <ul id="list-indexeddb">
+      <li class="empty">Nenhum banco IndexedDB detectado.</li>
+    </ul>
+  </div>
+
+  <div id="tab-fingerprint" class="tab-content">
+    <div class="section-header">
+      Fingerprinting
+      <span id="count-fingerprint" class="badge badge-red">0</span>
+    </div>
+    <div id="fingerprint-summary" class="cookie-summary"></div>
+    <ul id="list-fingerprint">
+      <li class="empty">Nenhuma tentativa detectada.</li>
     </ul>
   </div>
 

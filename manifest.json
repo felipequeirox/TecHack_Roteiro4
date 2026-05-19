@@ -51,5 +51,5 @@
     "default_title": "Privacy Extension"
   },
 
-  "web_accessible_resources": ["content_script.js"]
+  "web_accessible_resources": ["content_script.js", "injected.js"]
 }
