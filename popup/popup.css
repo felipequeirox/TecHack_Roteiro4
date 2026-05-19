@@ -1,0 +1,147 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 380px;
+  max-height: 500px;
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  color: #1a1a1a;
+  background: #fff;
+  overflow-y: auto;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid #e5e5e5;
+  background: #1e3a5f;
+  color: #fff;
+}
+
+header h1 {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+#version {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+section {
+  padding: 12px 14px;
+}
+
+h2 {
+  font-size: 12px;
+  font-weight: 600;
+  color: #444;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.badge {
+  background: #1e3a5f;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 10px;
+  min-width: 22px;
+  text-align: center;
+}
+
+.page-url {
+  font-size: 11px;
+  color: #666;
+  margin-bottom: 8px;
+  word-break: break-all;
+}
+
+ul {
+  list-style: none;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+li {
+  padding: 7px 10px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+li:last-child {
+  border-bottom: none;
+}
+
+li.empty {
+  color: #999;
+  font-style: italic;
+  justify-content: center;
+  padding: 14px;
+}
+
+.domain {
+  flex: 1;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.type-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #f0f0f0;
+  color: #555;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.type-script    { 
+    background: #fff3cd; 
+    color: #856404; 
+}
+
+.type-image     { 
+    background: #d1ecf1; 
+    color: #0c5460; 
+}
+
+.type-sub_frame { 
+    background: #f8d7da; 
+    color: #721c24; 
+}
+
+.type-xmlhttprequest { 
+    background: #d4edda; 
+    color: #155724; 
+}
+
+.type-stylesheet { 
+    background: #e2d9f3; 
+    color: #4a235a; 
+}
+
+.type-font { 
+    background: #fde8d8; 
+    color: #7d3c0a; 
+}
+
+.count {
+  font-size: 11px;
+  color: #999;
+  flex-shrink: 0;
+}
