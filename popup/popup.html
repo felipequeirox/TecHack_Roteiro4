@@ -8,18 +8,46 @@
 
   <header>
     <h1>Privacy Monitor</h1>
+    <span id="version">v0.3</span>
   </header>
 
-  <section id="section-third-parties">
-    <h2>
+  <nav>
+    <button class="tab-btn active" data-tab="third-parties">3rd Parties</button>
+    <button class="tab-btn" data-tab="cookies">Cookies</button>
+  </nav>
+
+  <div id="tab-third-parties" class="tab-content active">
+    <div class="section-header">
       Domínios de terceira parte
       <span id="count-third-parties" class="badge">0</span>
-    </h2>
+    </div>
     <div id="page-url" class="page-url">—</div>
     <ul id="list-third-parties">
-      <li class="empty">Nenhuma conexão de terceira parte detectada.</li>
+      <li class="empty">Nenhuma conexão detectada.</li>
     </ul>
-  </section>
+  </div>
+
+  <div id="tab-cookies" class="tab-content">
+    <div class="section-header">
+      Cookies
+      <span id="count-cookies" class="badge">0</span>
+    </div>
+
+    <div class="cookie-summary" id="cookie-summary"></div>
+
+    <div class="subsection-title">Lista de cookies</div>
+    <ul id="list-cookies">
+      <li class="empty">Nenhum cookie detectado.</li>
+    </ul>
+
+    <div class="subsection-title" style="margin-top:10px">
+      Supercookies
+      <span id="count-supercookies" class="badge badge-red">0</span>
+    </div>
+    <ul id="list-supercookies">
+      <li class="empty">Nenhum supercookie detectado.</li>
+    </ul>
+  </div>
 
   <script src="popup.js"></script>
 </body>

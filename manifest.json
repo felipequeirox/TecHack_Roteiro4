@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  "name": "Extensão Privacidade",
+  "name": "Privacy Extension",
   "version": "0.1",
   "description": "Detecta ameaças à privacidade e rastreamento em tempo real.",
 
@@ -20,7 +20,7 @@
     }
   },
 
-  "permissions": [
+    "permissions": [
     "webRequest",
     "webRequestBlocking",
     "cookies",
@@ -28,7 +28,7 @@
     "tabs",
     "privacy",
     "<all_urls>"
-  ],
+    ],
 
   "background": {
     "scripts": ["extension.js"]
