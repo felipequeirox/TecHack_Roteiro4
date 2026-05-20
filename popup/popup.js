@@ -5,6 +5,7 @@ browser.tabs.query({ active: true, currentWindow: true }).then(tabs => {
   browser.runtime.sendMessage({ type: "GET_DATA", tabId })
     .then(data => {
       if (!data) return;
+      renderPrivacyScore(data.privacyScore);
       renderThirdParties(data);
       renderCookies(data);
       renderStorage(data);
@@ -12,6 +13,7 @@ browser.tabs.query({ active: true, currentWindow: true }).then(tabs => {
       renderHijacking(data);
     })
     .catch(() => {
+      renderPrivacyScore(null);
       renderThirdParties({ url: "", thirdParties: [] });
       renderCookies({ cookies: [], supercookies: [] });
       renderStorage({ storage: [] });
@@ -257,4 +259,21 @@ function renderHijacking(data) {
       ${h.domain ? `<span class="domain">${h.domain}</span>` : ""}
     </li>
   `).join("");
+}
+
+function renderPrivacyScore(data) {
+  const valueEl = document.getElementById("privacy-score-value");
+  const labelEl = document.getElementById("privacy-score-label");
+  const detailEl = document.getElementById("privacy-score-detail");
+
+  if (!data) {
+    valueEl.textContent = "—";
+    labelEl.textContent = "Sem dados";
+    detailEl.textContent = "";
+    return;
+  }
+
+  valueEl.textContent = `${data.score}`;
+  labelEl.textContent = data.label;
+  detailEl.textContent = `Risco estimado: ${data.risk}/100`;
 }

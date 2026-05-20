@@ -64,12 +64,16 @@
 
 (function injectFingerprintHooks() {
   try {
-    const script = document.createElement("script");
-    script.src   = browser.runtime.getURL("injected.js");
-    script.async = false;
-
-    (document.head || document.documentElement).prepend(script);
-    script.onload = function () { this.remove(); };
+    const url = browser.runtime.getURL("injected.js");
+    fetch(url)
+      .then(r => r.text())
+      .then(code => {
+        const script = document.createElement("script");
+        script.textContent = code;
+        (document.head || document.documentElement).prepend(script);
+        script.remove();
+      })
+      .catch(() => {});
   } catch (e) {}
 })();
 

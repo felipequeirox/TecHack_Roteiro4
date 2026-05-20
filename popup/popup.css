@@ -163,3 +163,44 @@ li.empty {
 .type-stylesheet    { background: #e2d9f3; color: #4a235a; }
 .type-font          { background: #fde8d8; color: #7d3c0a; }
 .count { font-size: 11px; color: #999; flex-shrink: 0; }
+
+.score-box {
+  margin: 10px 14px;
+  padding: 10px;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  background: #f9fbff;
+}
+
+.score-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #444;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.score-main {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+#privacy-score-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e3a5f;
+}
+
+#privacy-score-label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 600;
+}
+
+.score-detail {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #777;
+}

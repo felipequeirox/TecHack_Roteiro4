@@ -47,6 +47,92 @@ function initTab(tabId, url) {
   };
 }
 
+function uniqueCount(items, keyFn) {
+  return new Set((items || []).map(keyFn)).size;
+}
+
+function computePrivacyScore(data) {
+  const thirdParties   = data.thirdParties || [];
+  const cookies        = data.cookies || [];
+  const supercookies   = data.supercookies || [];
+  const storage        = data.storage || [];
+  const fingerprinting = data.fingerprinting || [];
+  const hijacking      = data.hijacking || [];
+
+  let risk = 0;
+  const breakdown = {};
+
+  // 1) Third-parties
+  const thirdDomains = uniqueCount(thirdParties, item => item.domain);
+  const thirdScripts  = thirdParties.filter(item => item.type === "script").length;
+  const thirdFrames   = thirdParties.filter(item => item.type === "sub_frame").length;
+
+  breakdown.thirdParties = Math.min(25, thirdDomains * 3 + thirdScripts * 1 + thirdFrames * 2);
+  risk += breakdown.thirdParties;
+
+  // 2) Cookies / supercookies
+  const thirdPartyCookies = cookies.filter(c => !c.firstParty).length;
+  const persistentCookies = cookies.filter(c => !c.session).length;
+
+  breakdown.cookies = Math.min(
+    15,
+    thirdPartyCookies * 1.5 + persistentCookies * 0.5 + supercookies.length * 4
+  );
+  risk += breakdown.cookies;
+
+  // 3) Storage
+  const storageOrigins = storage.length;
+  let storageItems = 0;
+
+  storage.forEach(s => {
+    storageItems += (s.localStorage || []).length;
+    storageItems += (s.sessionStorage || []).length;
+    storageItems += (s.indexedDB || []).length;
+  });
+
+  breakdown.storage = Math.min(15, storageOrigins * 2 + storageItems * 0.25);
+  risk += breakdown.storage;
+
+  // 4) Fingerprinting
+  const fpApis = new Set(fingerprinting.map(f => f.api));
+  const hasCanvas = fpApis.has("Canvas");
+  const hasWebGL  = fpApis.has("WebGL") || fpApis.has("WebGL2");
+  const hasAudio  = fpApis.has("AudioContext") || fpApis.has("OfflineAudioContext");
+  const hasDebug  = fingerprinting.some(f => f.debugRenderer);
+
+  breakdown.fingerprinting = Math.min(
+    35,
+    (hasCanvas ? 10 : 0) +
+    (hasWebGL  ? 12 : 0) +
+    (hasAudio  ? 10 : 0) +
+    (hasDebug  ? 3  : 0) +
+    Math.min(5, Math.floor(Math.max(0, fingerprinting.length - 3) / 2))
+  );
+  risk += breakdown.fingerprinting;
+
+  // 5) Hijacking / hooking
+  const externalScripts = hijacking.filter(h => h.type === "external_script").length;
+  const redirects       = hijacking.filter(h => h.type === "redirect").length;
+  const hookings        = hijacking.filter(h => h.type === "hooking" || h.type === "tamper").length;
+
+  breakdown.hijacking = Math.min(10, externalScripts * 1 + redirects * 2 + hookings * 4);
+  risk += breakdown.hijacking;
+
+  const score = Math.max(0, Math.round(100 - risk));
+
+  let label = "Bom";
+  if (score < 40) label = "Crítico";
+  else if (score < 60) label = "Ruim";
+  else if (score < 80) label = "Moderado";
+
+  return {
+    score,
+    label,
+    risk: Math.round(risk),
+    breakdown
+  };
+}
+
 function classifyCookies(cookies, pageUrl) {
   let pageDomain;
 
@@ -233,6 +319,8 @@ browser.runtime.onMessage.addListener(function (message, sender, sendResponse) {
       hijacking: []
     };
 
+    const privacyScore = computePrivacyScore(data);
+
     sendResponse({
       url: data.url,
       thirdParties: data.thirdParties,
@@ -240,7 +328,8 @@ browser.runtime.onMessage.addListener(function (message, sender, sendResponse) {
       supercookies: data.supercookies,
       storage: data.storage,
       fingerprinting: data.fingerprinting,
-      hijacking: data.hijacking || []
+      hijacking: data.hijacking || [],
+      privacyScore: privacyScore
     });
 
     return;

@@ -10,12 +10,22 @@
     <h1>Privacy Extension</h1>
   </header>
 
+  <div id="privacy-score-box" class="score-box">
+    <div class="score-title">Privacy Score</div>
+    <div class="score-main">
+      <span id="privacy-score-value">—</span>
+      <span id="privacy-score-label">—</span>
+    </div>
+    <div id="privacy-score-detail" class="score-detail"></div>
+  </div>
+
 <nav>
   <button class="tab-btn active" data-tab="third-parties">3rd Parties</button>
   <button class="tab-btn" data-tab="cookies">Cookies</button>
   <button class="tab-btn" data-tab="storage">Storage</button>
   <button class="tab-btn" data-tab="fingerprint">Fingerprint</button>
   <button class="tab-btn" data-tab="hijacking">Hijacking</button>
+  
 </nav>
 
   <div id="tab-third-parties" class="tab-content active">
