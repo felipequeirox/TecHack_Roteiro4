@@ -9,12 +9,14 @@ browser.tabs.query({ active: true, currentWindow: true }).then(tabs => {
       renderCookies(data);
       renderStorage(data);
       renderFingerprint(data);
+      renderHijacking(data);
     })
     .catch(() => {
       renderThirdParties({ url: "", thirdParties: [] });
       renderCookies({ cookies: [], supercookies: [] });
       renderStorage({ storage: [] });
       renderFingerprint({ fingerprinting: [] });
+      renderHijacking({ hijacking: [] });
     });
 });
 
@@ -226,7 +228,7 @@ function renderFingerprint(data) {
         <span class="name">
           ${escapeHtml(f.api)}.${escapeHtml(f.method)}
           ${f.debugRenderer ? '<span class="tag tag-third">⚠ debug renderer</span>' : ''}
- ss       </span>
+        </span>
         <span class="tag ${f.isFirstParty ? 'tag-first' : 'tag-third'}">
           ${f.isFirstParty ? '1ª' : '3ª'}
         </span>
@@ -235,4 +237,24 @@ function renderFingerprint(data) {
       </li>
     `;
   }).join("");
+  
+}
+
+function renderHijacking(data) {
+  const hij = data.hijacking || [];
+  document.getElementById("count-hijacking").textContent = hij.length;
+
+  const list = document.getElementById("list-hijacking");
+
+  if (hij.length === 0) {
+    list.innerHTML = '<li class="empty">Nenhuma ameaça detectada.</li>';
+    return;
+  }
+
+  list.innerHTML = hij.map(h => `
+    <li>
+      <span class="name">${h.type}</span>
+      ${h.domain ? `<span class="domain">${h.domain}</span>` : ""}
+    </li>
+  `).join("");
 }

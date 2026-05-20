@@ -17,7 +17,7 @@ function getRootDomain(hostname) {
 function isThirdParty(requestUrl, pageUrl) {
   try {
     const requestDomain = getRootDomain(new URL(requestUrl).hostname);
-    const pageDomain    = getRootDomain(new URL(pageUrl).hostname);
+    const pageDomain = getRootDomain(new URL(pageUrl).hostname);
 
     return requestDomain !== pageDomain && requestDomain !== "";
   } catch (e) {
@@ -28,7 +28,7 @@ function isThirdParty(requestUrl, pageUrl) {
 function isFirstPartyOrigin(origin, pageUrl) {
   try {
     const originDomain = getRootDomain(new URL(origin).hostname);
-    const pageDomain   = getRootDomain(new URL(pageUrl).hostname);
+    const pageDomain = getRootDomain(new URL(pageUrl).hostname);
     return originDomain === pageDomain;
   } catch (e) {
     return false;
@@ -37,12 +37,13 @@ function isFirstPartyOrigin(origin, pageUrl) {
 
 function initTab(tabId, url) {
   tabData[tabId] = {
-    url:            url,
-    thirdParties:   [],
-    cookies:        [],
-    supercookies:   [],
-    storage:        [],
-    fingerprinting: []
+    url: url,
+    thirdParties: [],
+    cookies: [],
+    supercookies: [],
+    storage: [],
+    fingerprinting: [],
+    hijacking: []
   };
 }
 
@@ -55,24 +56,24 @@ function classifyCookies(cookies, pageUrl) {
     return [];
   }
 
-  return cookies.map(function(cookie) {
+  return cookies.map(function (cookie) {
     const cookieDomain = getRootDomain(cookie.domain.replace(/^\./, ""));
     const isFirstParty = cookieDomain === pageDomain;
-    const isSession    = !cookie.expirationDate;
-    const expiresDate  = cookie.expirationDate
+    const isSession = !cookie.expirationDate;
+    const expiresDate = cookie.expirationDate
       ? new Date(cookie.expirationDate * 1000).toLocaleDateString("pt-BR")
       : "sessão";
 
     return {
-      name:       cookie.name,
-      domain:     cookie.domain,
+      name: cookie.name,
+      domain: cookie.domain,
       firstParty: isFirstParty,
-      session:    isSession,
-      secure:     cookie.secure,
-      httpOnly:   cookie.httpOnly,
-      sameSite:   cookie.sameSite,
-      size:       cookie.name.length + (cookie.value ? cookie.value.length : 0),
-      expires:    expiresDate
+      session: isSession,
+      secure: cookie.secure,
+      httpOnly: cookie.httpOnly,
+      sameSite: cookie.sameSite,
+      size: cookie.name.length + (cookie.value ? cookie.value.length : 0),
+      expires: expiresDate
     };
   });
 }
@@ -81,12 +82,18 @@ function scanCookies(tabId) {
   const tab = tabData[tabId];
   if (!tab || !tab.url) return;
 
-  browser.cookies.getAll({ url: tab.url }).then(function(cookies) {
+  browser.cookies.getAll({ url: tab.url }).then(function (cookies) {
     tabData[tabId].cookies = classifyCookies(cookies, tab.url);
-  }).catch(function() {});
+  }).catch(function () {});
 }
 
-browser.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+function addHijacking(tabId, item) {
+  if (!tabData[tabId]) return;
+  tabData[tabId].hijacking = tabData[tabId].hijacking || [];
+  tabData[tabId].hijacking.push(item);
+}
+
+browser.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   if (!tab.url) return;
 
   const isHttp = tab.url.startsWith("http://") || tab.url.startsWith("https://");
@@ -101,12 +108,12 @@ browser.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   }
 });
 
-browser.tabs.onRemoved.addListener(function(tabId) {
+browser.tabs.onRemoved.addListener(function (tabId) {
   delete tabData[tabId];
 });
 
 browser.webRequest.onBeforeRequest.addListener(
-  function(details) {
+  function (details) {
     const tabId = details.tabId;
 
     if (tabId < 0) return;
@@ -123,7 +130,7 @@ browser.webRequest.onBeforeRequest.addListener(
       return;
     }
 
-    const existing = tabData[tabId].thirdParties.find(function(tp) {
+    const existing = tabData[tabId].thirdParties.find(function (tp) {
       return tp.domain === requestDomain && tp.type === details.type;
     });
 
@@ -132,17 +139,47 @@ browser.webRequest.onBeforeRequest.addListener(
     } else {
       tabData[tabId].thirdParties.push({
         domain: requestDomain,
-        type:   details.type,
-        url:    details.url,
-        count:  1
+        type: details.type,
+        url: details.url,
+        count: 1
+      });
+    }
+
+    if (details.type === "script") {
+      addHijacking(tabId, {
+        type: "external_script",
+        domain: requestDomain,
+        url: details.url
       });
     }
   },
   { urls: ["<all_urls>"] }
 );
 
+browser.webRequest.onBeforeRedirect.addListener(
+  function (details) {
+    const tabId = details.tabId;
+
+    if (tabId < 0) return;
+    if (!tabData[tabId]) return;
+
+    const pageUrl = tabData[tabId].url;
+    if (!isThirdParty(details.url, pageUrl) && !isThirdParty(details.redirectUrl || "", pageUrl)) {
+      return;
+    }
+
+    addHijacking(tabId, {
+      type: "redirect",
+      from: details.url || "",
+      to: details.redirectUrl || "",
+      statusCode: details.statusCode || 0
+    });
+  },
+  { urls: ["<all_urls>"] }
+);
+
 browser.webRequest.onHeadersReceived.addListener(
-  function(details) {
+  function (details) {
     const tabId = details.tabId;
 
     if (tabId < 0) return;
@@ -158,21 +195,25 @@ browser.webRequest.onHeadersReceived.addListener(
       return;
     }
 
-    const headers  = details.responseHeaders || [];
-    const hasHSTS  = headers.some(function(h) { return h.name.toLowerCase() === "strict-transport-security"; });
-    const hasEtag  = headers.some(function(h) { return h.name.toLowerCase() === "etag"; });
+    const headers = details.responseHeaders || [];
+    const hasHSTS = headers.some(function (h) {
+      return h.name.toLowerCase() === "strict-transport-security";
+    });
+    const hasEtag = headers.some(function (h) {
+      return h.name.toLowerCase() === "etag";
+    });
 
     if (!hasHSTS && !hasEtag) return;
 
-    const alreadyDetected = tabData[tabId].supercookies.find(function(s) {
+    const alreadyDetected = tabData[tabId].supercookies.find(function (s) {
       return s.domain === requestDomain;
     });
 
     if (!alreadyDetected) {
       tabData[tabId].supercookies.push({
         domain: requestDomain,
-        hsts:   hasHSTS,
-        etag:   hasEtag
+        hsts: hasHSTS,
+        etag: hasEtag
       });
     }
   },
@@ -180,25 +221,28 @@ browser.webRequest.onHeadersReceived.addListener(
   ["responseHeaders"]
 );
 
-browser.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+browser.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   if (message.type === "GET_DATA") {
     const data = tabData[message.tabId] || {
-      url:            "",
-      thirdParties:   [],
-      cookies:        [],
-      supercookies:   [],
-      storage:        [],
-      fingerprinting: []
+      url: "",
+      thirdParties: [],
+      cookies: [],
+      supercookies: [],
+      storage: [],
+      fingerprinting: [],
+      hijacking: []
     };
 
     sendResponse({
-      url:            data.url,
-      thirdParties:   data.thirdParties,
-      cookies:        data.cookies,
-      supercookies:   data.supercookies,
-      storage:        data.storage,
-      fingerprinting: data.fingerprinting
+      url: data.url,
+      thirdParties: data.thirdParties,
+      cookies: data.cookies,
+      supercookies: data.supercookies,
+      storage: data.storage,
+      fingerprinting: data.fingerprinting,
+      hijacking: data.hijacking || []
     });
+
     return;
   }
 
@@ -208,18 +252,18 @@ browser.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 
     const frameId = sender.frameId != null ? sender.frameId : 0;
 
-    tabData[tabId].storage = tabData[tabId].storage.filter(function(s) {
+    tabData[tabId].storage = tabData[tabId].storage.filter(function (s) {
       return !(s.origin === message.origin && s.frameId === frameId);
     });
 
     tabData[tabId].storage.push({
-      origin:         message.origin,
-      frameUrl:       message.frameUrl,
-      frameId:        frameId,
-      isFirstParty:   isFirstPartyOrigin(message.origin, tabData[tabId].url),
-      localStorage:   message.localStorage   || [],
+      origin: message.origin,
+      frameUrl: message.frameUrl,
+      frameId: frameId,
+      isFirstParty: isFirstPartyOrigin(message.origin, tabData[tabId].url),
+      localStorage: message.localStorage || [],
       sessionStorage: message.sessionStorage || [],
-      indexedDB:      message.indexedDB      || []
+      indexedDB: message.indexedDB || []
     });
     return;
   }
@@ -230,10 +274,10 @@ browser.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 
     const fp = tabData[tabId].fingerprinting;
 
-    const existing = fp.find(function(f) {
-      return f.origin === message.origin
-          && f.api    === message.api
-          && f.method === message.method;
+    const existing = fp.find(function (f) {
+      return f.origin === message.origin &&
+        f.api === message.api &&
+        f.method === message.method;
     });
 
     if (existing) {
@@ -243,14 +287,14 @@ browser.runtime.onMessage.addListener(function(message, sender, sendResponse) {
       }
     } else {
       fp.push({
-        origin:        message.origin,
-        isFirstParty:  isFirstPartyOrigin(message.origin, tabData[tabId].url),
-        api:           message.api,
-        method:        message.method,
-        count:         1,
-        stack:         message.stack || "",
+        origin: message.origin,
+        isFirstParty: isFirstPartyOrigin(message.origin, tabData[tabId].url),
+        api: message.api,
+        method: message.method,
+        count: 1,
+        stack: message.stack || "",
         debugRenderer: !!(message.extra && message.extra.debugRenderer),
-        firstSeen:     Date.now()
+        firstSeen: Date.now()
       });
     }
   }
