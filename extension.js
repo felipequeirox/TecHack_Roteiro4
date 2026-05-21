@@ -321,18 +321,16 @@ browser.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
     const privacyScore = computePrivacyScore(data);
 
-    sendResponse({
-      url: data.url,
-      thirdParties: data.thirdParties,
-      cookies: data.cookies,
-      supercookies: data.supercookies,
-      storage: data.storage,
+    return Promise.resolve({
+      url:           data.url,
+      thirdParties:  data.thirdParties,
+      cookies:       data.cookies,
+      supercookies:  data.supercookies,
+      storage:       data.storage,
       fingerprinting: data.fingerprinting,
-      hijacking: data.hijacking || [],
-      privacyScore: privacyScore
+      hijacking:     data.hijacking || [],
+      privacyScore:  privacyScore
     });
-
-    return;
   }
 
   if (message.type === "STORAGE_DATA") {

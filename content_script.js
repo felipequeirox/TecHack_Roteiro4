@@ -80,7 +80,7 @@
 window.addEventListener("message", function (event) {
   if (event.source !== window) return;
   const data = event.data;
-  if (!data || data.__privacyMonitor !== true) return;
+  if (!data || data.__privacyExtension !== true) return;
 
   browser.runtime.sendMessage({
     type:     "FINGERPRINT_EVENT",
