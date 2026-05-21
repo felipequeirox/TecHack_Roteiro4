@@ -1,4 +1,4 @@
-## Privacy Score (Versão Temporária)
+## Privacy Score
 
 O **Privacy Score** é uma métrica heurística que vai de **0 a 100**:
 
