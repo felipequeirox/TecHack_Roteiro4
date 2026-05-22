@@ -33,15 +33,20 @@ git clone https://github.com/felipequeirox/TecHack_Roteiro4.git
 ## Uso
 
 1. Navegue até qualquer página HTTP/HTTPS.
+
 2. Clique no ícone da **Privacy Extension** na barra de ferramentas para abrir o popup.
-3. O popup exibe o **Privacy Score** no topo e cinco abas:| Aba                   | Conteúdo                                                                                            |
-   | --------------------- | ---------------------------------------------------------------------------------------------------- |
-   | **3rd Parties** | Domínios externos contactados, com tipo de recurso e contagem.                                      |
-   | **Cookies**     | Lista de cookies com classificação 1ª/3ª parte e sessão/persistente, e supercookies detectados. |
-   | **Storage**     | Entradas em `localStorage`,`sessionStorage`e bancos `IndexedDB`.                               |
-   | **Fingerprint** | APIs de fingerprinting acessadas, com método, origem e contagem.                                    |
-   | **Hijacking**   | Scripts externos, redirecionamentos e adulteração de APIs nativas.                                 |
-4. A coleta é por  **aba** : cada aba do navegador tem seu próprio relatório, reiniciado a cada novo carregamento de página.
+
+3. O popup exibe o **Privacy Score** no topo e cinco abas:
+
+| Aba             | Conteúdo |
+|-----------------|-----------|
+| **3rd Parties** | Domínios externos contactados, com tipo de recurso e contagem. |
+| **Cookies** | Lista de cookies com classificação 1ª/3ª parte e sessão/persistente, e supercookies detectados. |
+| **Storage** | Entradas em `localStorage`, `sessionStorage` e bancos `IndexedDB`. |
+| **Fingerprint** | APIs de fingerprinting acessadas, com método, origem e contagem. |
+| **Hijacking** | Scripts externos, redirecionamentos e adulteração de APIs nativas. |
+
+4. A coleta é por **aba**: cada aba do navegador tem seu próprio relatório, reiniciado a cada novo carregamento de página.
 5. Para obter uma leitura completa, abra a página com o popup fechado e aguarde o carregamento terminar antes de abri-lo.
 
 ## Privacy Score
