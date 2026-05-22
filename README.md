@@ -11,11 +11,6 @@ Extensão para Firefox que detecta e apresenta, em tempo real, os principais vet
 * **Hijacking / Hooking:** detecta scripts externos, redirecionamentos entre domínios e adulteração de APIs nativas (`fetch`, `history.pushState`, `history.replaceState`).
 * **Privacy Score:** pontuação de 0 a 100 calculada a partir dos sinais coletados, com rótulo qualitativo (Crítico / Ruim / Moderado / Bom).
 
-## Requisitos
-
-* Firefox 109 ou superior.
-* Extensão escrita em **Manifest V2** (suporte mantido pelo Firefox).
-
 ## Instalação (modo desenvolvedor)
 
 A extensão ainda não está publicada na loja de add-ons. Para testá-la localmente:
@@ -48,8 +43,6 @@ git clone https://github.com/felipequeirox/TecHack_Roteiro4.git
    | **Hijacking**   | Scripts externos, redirecionamentos e adulteração de APIs nativas.                                 |
 4. A coleta é por  **aba** : cada aba do navegador tem seu próprio relatório, reiniciado a cada novo carregamento de página.
 5. Para obter uma leitura completa, abra a página com o popup fechado e aguarde o carregamento terminar antes de abri-lo.
-
----
 
 ## Privacy Score
 
