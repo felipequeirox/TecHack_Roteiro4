@@ -49,8 +49,6 @@ git clone https://github.com/felipequeirox/TecHack_Roteiro4.git
 4. A coleta é por  **aba** : cada aba do navegador tem seu próprio relatório, reiniciado a cada novo carregamento de página.
 5. Para obter uma leitura completa, abra a página com o popup fechado e aguarde o carregamento terminar antes de abri-lo.
 
----
-
 ## Privacy Score
 
 O **Privacy Score** é uma métrica heurística que vai de **0 a 100**:
