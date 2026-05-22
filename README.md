@@ -11,11 +11,6 @@ Extensão para Firefox que detecta e apresenta, em tempo real, os principais vet
 * **Hijacking / Hooking:** detecta scripts externos, redirecionamentos entre domínios e adulteração de APIs nativas (`fetch`, `history.pushState`, `history.replaceState`).
 * **Privacy Score:** pontuação de 0 a 100 calculada a partir dos sinais coletados, com rótulo qualitativo (Crítico / Ruim / Moderado / Bom).
 
-## Requisitos
-
-* Firefox 109 ou superior.
-* Extensão escrita em **Manifest V2** (suporte mantido pelo Firefox).
-
 ## Instalação (modo desenvolvedor)
 
 A extensão ainda não está publicada na loja de add-ons. Para testá-la localmente:
