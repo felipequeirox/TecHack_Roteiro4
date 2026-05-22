@@ -41,7 +41,12 @@ function escapeHtml(str) {
 }
 
 function renderThirdParties(data) {
-  document.getElementById("page-url").textContent = data.url || "—";
+  const urlEl = document.getElementById("page-url");
+  try {
+    urlEl.textContent = new URL(data.url).hostname;
+  } catch (e) {
+    urlEl.textContent = "—";
+  }
 
   const parties = data.thirdParties || [];
   document.getElementById("count-third-parties").textContent = parties.length;
@@ -253,12 +258,28 @@ function renderHijacking(data) {
     return;
   }
 
-  list.innerHTML = hij.map(h => `
-    <li>
-      <span class="name">${h.type}</span>
-      ${h.domain ? `<span class="domain">${h.domain}</span>` : ""}
-    </li>
-  `).join("");
+  list.innerHTML = hij.map(h => {
+    if (h.type === "redirect") {
+      let fromHost = h.from || "";
+      let toHost = h.to || "";
+      try { fromHost = new URL(h.from).hostname; } catch (e) {}
+      try { toHost   = new URL(h.to).hostname; }   catch (e) {}
+
+      return `
+        <li>
+          <span class="name">redirect</span>
+          <span class="domain">${escapeHtml(fromHost)} → ${escapeHtml(toHost)}</span>
+        </li>
+      `;
+    }
+
+    return `
+      <li>
+        <span class="name">${escapeHtml(h.type)}</span>
+        ${h.domain ? `<span class="domain">${escapeHtml(h.domain)}</span>` : ""}
+      </li>
+    `;
+  }).join("");
 }
 
 function renderPrivacyScore(data) {
